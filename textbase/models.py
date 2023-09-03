@@ -4,10 +4,12 @@ import requests
 import time
 import typing
 import traceback
+import requests
 
 from textbase import Message
 
 # Return list of values of content.
+
 def get_contents(message: Message, data_type: str):
     return [
         {
@@ -37,6 +39,8 @@ class OpenAI:
         model="gpt-3.5-turbo",
         max_tokens=3000,
         temperature=0.7,
+        functions=None,
+        function_call=None,
     ):
         assert cls.api_key is not None, "OpenAI API key is not set."
         openai.api_key = cls.api_key
@@ -60,9 +64,11 @@ class OpenAI:
             ],
             temperature=temperature,
             max_tokens=max_tokens,
+            functions=functions,
+            function_call=function_call
         )
-
-        return response["choices"][0]["message"]["content"]
+        
+        return response
 
 class HuggingFace:
     api_key = None
