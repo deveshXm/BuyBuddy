@@ -7,7 +7,6 @@ from textbase.models import OpenAI
 from typing import List
 from db import FileDatabase
 from twilio.rest import Client
-import pyttsx3
 
 # Initialize the text-to-speech engine
 # engine = pyttsx3.init()
@@ -22,14 +21,14 @@ import pyttsx3
 # Run the event loop to make sure the speech is played
 # engine.runAndWait()
 
-account_sid = '[AccountSID]'
-auth_token = '[AuthToken]'
-client = Client(account_sid, auth_token)
+# account_sid = '[AccountSID]'
+# auth_token = '[AuthToken]'
+# client = Client(account_sid, auth_token)
 
-rapid_api_key = '[Your Rapid API Key]'
+rapid_api_key = 'c0026554b8msh7b823f7388d3b8fp1be669jsna24bc542330f'
 
 # Load your OpenAI API key
-OpenAI.api_key = "[Open AI API Key]"
+OpenAI.api_key = "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"
 db = FileDatabase("database.json")
 
 # or from environment variable:
@@ -102,48 +101,54 @@ def on_message(message_history: List[Message], state: dict = None):
     
     finish_reason = response["choices"][0]["finish_reason"]
     bot_response = "some error occured. Try again later"
-    print(response)
-    if finish_reason == "stop":
-        bot_response = response["choices"][0]["message"]["content"]
-    elif finish_reason == "function_call":
-        data = json.loads(response["choices"][0]["message"]["function_call"]["arguments"])
-        if data.get('product client wants to buy') is not None and data.get('address of client') is None and data.get('address of client') is None :
-            print("CALLED 1")
-            searchProduct = data["product client wants to buy"]
-            findProductsInDB = db.find(searchProduct)
-            productsDataInDB = findProductsInDB['Data']
-            productsDataInDBLength = len(productsDataInDB)
-            if productsDataInDBLength == 5:
-                random_number = random.randint(0, productsDataInDBLength - 1) 
-                bot_response = findProductsInDB['Data'][random_number]
-            else :    
-                products = getSimilarProducts(searchProduct)
-                productsResponse = "Great Pick! Here are some products you'd like \n\n"
-                for index,product in enumerate(products):
-                    if index < 5:
-                        productsResponse += ("\n \n"
-                                            +"No. " + str(index + 1) 
-                                            +  " " +  product["product_title"] 
-                                            +"\n \n" 
-                                            +"Link : " + product['product_url'] 
-                                            +"\n \n" 
-                                            +"Price : " + product['product_price']
-                                            +"\n \n\r\t\v") 
-                    else :
-                        break
-                db.add({'ID' : searchProduct , 'Data' : [productsResponse] })
-                bot_response =  productsResponse
-        elif data.get("contact of client") is not None and data.get("address of client") is not None and data.get("contact of client") is not None:
-            message = client.messages.create(
-              from_='whatsapp:+14155238886',
-              body='Thank you for ordering. Your order will be delivered soon.',
-              to='whatsapp:+91' + data["contact of client"] 
-            )
-            print(message.sid)
-            bot_response =  "Thank you for ordering! We have placed your order. You will a confirmation message on your whatsapp shortly!"
-            
+    try:
+        if finish_reason == "stop":
+            bot_response = response["choices"][0]["message"]["content"]
+        elif finish_reason == "function_call":
+            data = json.loads(response["choices"][0]["message"]["function_call"]["arguments"])
+            if data.get('product client wants to buy') is not None and data.get('address of client') is None and data.get('address of client') is None :
+                searchProduct = data["product client wants to buy"]
+                findProductsInDB = db.find(searchProduct)
+                productsDataInDB = findProductsInDB['Data']
+                productsDataInDBLength = len(productsDataInDB)
+                if productsDataInDBLength == 5:
+                    random_number = random.randint(0, productsDataInDBLength - 1) 
+                    bot_response = findProductsInDB['Data'][random_number]
+                else :    
+                    products = getSimilarProducts(searchProduct)
+                    productsResponse = "Great Pick! Here are some products you'd like \n\n"
+                    for index,product in enumerate(products):
+                        if index < 5:
+                            productsResponse += ("\n \n"
+                                                +"No. " + str(index + 1) 
+                                                +  " " +  product["product_title"] 
+                                                +"\n \n" 
+                                                +"Link : " + product['product_url'] 
+                                                +"\n \n" 
+                                                +"Price : " + product['product_price']
+                                                +"\n \n\r\t\v") 
+                        else :
+                            break
+                    db.add({'ID' : searchProduct , 'Data' : [productsResponse] })
+                    bot_response =  productsResponse
+            elif data.get("contact of client") is not None and data.get("address of client") is not None and data.get("contact of client") is not None:
+                # message = client.messages.create(
+                #   from_='whatsapp:+14155238886',
+                #   body='Thank you for ordering. Your order will be delivered soon.',
+                #   to='whatsapp:+91' + data["contact of client"] 
+                # )
+                # print(message.sid)
+                bot_response =  "Thank you for ordering! We have placed your order. You will a confirmation message on your whatsapp shortly!"
+            else:
+                new_response = OpenAI.generate(
+                                    system_prompt=SYSTEM_PROMPT,
+                                    message_history=message_history,
+                                    model="gpt-3.5-turbo",
+                                )
+                bot_response = new_response["choices"][0]["message"]["content"]
+    except:
+        bot_response="I couldn't understand that. Please try again"
         
-
     response = {
         "data": {
             "messages": [

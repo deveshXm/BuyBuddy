@@ -52,21 +52,33 @@ class OpenAI:
             contents = get_contents(message, "STRING")
             if contents:
                 filtered_messages.extend(contents)
-
-        response = openai.ChatCompletion.create(
-            model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": system_prompt
-                },
-                *map(dict, filtered_messages),
-            ],
-            temperature=temperature,
-            max_tokens=max_tokens,
-            functions=functions,
-            function_call=function_call
-        )
+        response = response = openai.ChatCompletion.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": system_prompt
+                    },
+                    *map(dict, filtered_messages),
+                ],
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+        if functions is not None and function_call is not None:
+            response = openai.ChatCompletion.create(
+                model=model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": system_prompt
+                    },
+                    *map(dict, filtered_messages),
+                ],
+                temperature=temperature,
+                max_tokens=max_tokens,
+                functions=functions,
+                function_call=function_call
+            )
         
         return response
 
