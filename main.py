@@ -25,10 +25,10 @@ from twilio.rest import Client
 # auth_token = '[AuthToken]'
 # client = Client(account_sid, auth_token)
 
-rapid_api_key = 'c0026554b8msh7b823f7388d3b8fp1be669jsna24bc542330f'
+rapid_api_key = os.getenv("RAPID_API_KEY")
 
 # Load your OpenAI API key
-OpenAI.api_key = "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"
+OpenAI.api_key = os.getenv("OPEN_API_KEY")
 db = FileDatabase("database.json")
 
 # or from environment variable:
