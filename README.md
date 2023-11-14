@@ -1,5 +1,5 @@
-# E-Commerce Bot Documentation
-The Ecommerce Chatbot is a Python application that utilizes the ChatGPT language model to provide users with information and assistance related to online shopping and e-commerce. It is designed to engage in natural language conversations and help users with various e-commerce-related queries, such as finding products, making purchase recommendations, answering shopping-related questions, and more. This documentation outlines how to set up, configure, and use the Ecommerce Chatbot.
+# BuyBuddy
+The BuyBuddy is a Chat Bot that utilizes the ChatGPT language model to provide users with information and assistance related to online shopping and e-commerce. It is designed to engage in natural language conversations and help users with various e-commerce-related queries, such as finding products, making purchase recommendations, answering shopping-related questions, and more. This documentation outlines how to set up, configure, and use BuyBuddy.
 ## Table of Contents
 ### 1. [Introduction](#introduction)
 ### 2. [Installation](#installation)
